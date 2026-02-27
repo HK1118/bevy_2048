@@ -181,9 +181,12 @@ jobs:
           echo "package=${app_package_name}-"'${{ matrix.platform }}${{ matrix.package_ext }}' >> "${GITHUB_ENV}"
 
           # Rustflags:
-          RUSTFLAGS='-Zthreads=0'
-          if [ '${{ matrix.platform }}' != 'windows' ]; then
-            RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }"'-Zshare-generics=y'
+          RUSTFLAGS=''
+          if [ '${{ matrix.platform }}' != 'web' ]; then
+            RUSTFLAGS='-Zthreads=0'
+            if [ '${{ matrix.platform }}' != 'windows' ]; then
+              RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }"'-Zshare-generics=y'
+            fi
           fi
           if [ '${{ inputs.deny_warnings }}' = 'true' ]; then
             RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }"'-Dwarnings'
@@ -210,8 +213,14 @@ jobs:
         with:
           lfs: ${{ env.git_lfs }}
 
-      - name: Install Rust toolchain
-        if: ${{ env.is_platform_enabled == 'true' }}
+      - name: Install Rust toolchain (Web)
+        if: ${{ env.is_platform_enabled == 'true' && matrix.platform == 'web' }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+
+      - name: Install Rust toolchain (non-Web)
+        if: ${{ env.is_platform_enabled == 'true' && matrix.platform != 'web' }}
         uses: dtolnay/rust-toolchain@nightly
         with:
           targets: ${{ matrix.targets }}
