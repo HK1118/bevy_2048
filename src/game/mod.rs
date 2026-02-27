@@ -56,7 +56,7 @@ impl Plugin for GamePlugin {
                     .chain()
                     .run_if(in_state(GamePhase::Playing)),
             )
-            .add_systems(Update, (ui::sync_ui_score, ui::button_hover))
+            .add_systems(Update, (ui::sync_ui_score, ui::button_hover, ui::adapt_header_to_window))
             .add_systems(OnEnter(GamePhase::GameOver), ui::spawn_game_over_overlay)
             .add_systems(OnEnter(GamePhase::Won), ui::spawn_won_overlay)
             .add_systems(OnExit(GamePhase::GameOver), ui::despawn_overlay)

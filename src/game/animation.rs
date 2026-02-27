@@ -6,8 +6,8 @@ use super::board::{Board, Score, SlideResult};
 use super::input::Slide;
 use super::render::{VisualTile, board_index_to_position, spawn_visual_tile};
 
-const SLIDE_DURATION: f32 = 0.15;
-const EFFECT_DURATION: f32 = 0.1;
+const SLIDE_DURATION: f32 = 0.08;
+const EFFECT_DURATION: f32 = 0.05;
 const MERGE_SCALE_PEAK: f32 = 1.2;
 
 #[derive(Resource, Default, PartialEq, Debug)]

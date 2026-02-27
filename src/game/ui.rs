@@ -14,6 +14,12 @@ pub(super) struct UIScoreText;
 pub(super) struct NewGameButton;
 
 #[derive(Component)]
+pub(super) struct HeaderRoot;
+
+#[derive(Component)]
+pub(super) struct ButtonText;
+
+#[derive(Component)]
 pub(super) struct OverlayRoot;
 
 const BUTTON_BG: Color = Color::srgb(0.557, 0.494, 0.439);
@@ -21,19 +27,26 @@ const BUTTON_HOVER: Color = Color::srgb(0.647, 0.584, 0.529);
 const SCORE_COLOR: Color = Color::srgb(0.467, 0.431, 0.396);
 const OVERLAY_BG: Color = Color::srgba(0.0, 0.0, 0.0, 0.5);
 
+const NARROW_THRESHOLD: f32 = 500.0;
+
 pub(super) fn setup_ui(mut commands: Commands, font: Res<GameFont>) {
     commands
-        .spawn(Node {
-            width: Val::Percent(100.0),
-            padding: UiRect::axes(Val::Px(16.0), Val::Px(10.0)),
-            justify_content: JustifyContent::SpaceBetween,
-            align_items: AlignItems::Center,
-            position_type: PositionType::Absolute,
-            top: Val::Px(0.0),
-            left: Val::Px(0.0),
-            right: Val::Px(0.0),
-            ..default()
-        })
+        .spawn((
+            HeaderRoot,
+            Node {
+                width: Val::Percent(100.0),
+                padding: UiRect::axes(Val::Px(16.0), Val::Px(10.0)),
+                justify_content: JustifyContent::SpaceBetween,
+                align_items: AlignItems::Center,
+                flex_wrap: FlexWrap::Wrap,
+                row_gap: Val::Px(4.0),
+                position_type: PositionType::Absolute,
+                top: Val::Px(0.0),
+                left: Val::Px(0.0),
+                right: Val::Px(0.0),
+                ..default()
+            },
+        ))
         .with_children(|parent| {
             // スコアテキスト
             parent.spawn((
@@ -41,7 +54,7 @@ pub(super) fn setup_ui(mut commands: Commands, font: Res<GameFont>) {
                 Text::new("Score: 0"),
                 TextFont {
                     font: font.0.clone(),
-                    font_size: 28.0,
+                    font_size: 36.0,
                     ..default()
                 },
                 TextColor(SCORE_COLOR),
@@ -53,18 +66,19 @@ pub(super) fn setup_ui(mut commands: Commands, font: Res<GameFont>) {
                     NewGameButton,
                     Button,
                     Node {
-                        padding: UiRect::axes(Val::Px(16.0), Val::Px(8.0)),
+                        padding: UiRect::axes(Val::Px(24.0), Val::Px(12.0)),
                         justify_content: JustifyContent::Center,
                         align_items: AlignItems::Center,
-                        border_radius: BorderRadius::all(Val::Px(4.0)),
+                        border_radius: BorderRadius::all(Val::Px(6.0)),
                         ..default()
                     },
                     BackgroundColor(BUTTON_BG),
                     children![(
+                        ButtonText,
                         Text::new("New Game"),
                         TextFont {
                             font: font.0.clone(),
-                            font_size: 18.0,
+                            font_size: 24.0,
                             ..default()
                         },
                         TextColor(Color::WHITE),
@@ -246,5 +260,56 @@ pub(super) fn sync_ui_score(score: Res<Score>, mut query: Query<&mut Text, With<
 
     for mut text in &mut query {
         text.0 = format!("Score: {}", **score);
+    }
+}
+
+/// ウィンドウ幅に応じてヘッダーのフォントサイズとパディングを調整する
+pub(super) fn adapt_header_to_window(
+    windows: Query<&Window>,
+    mut header_query: Query<&mut Node, With<HeaderRoot>>,
+    mut score_query: Query<&mut TextFont, With<UIScoreText>>,
+    mut button_query: Query<&mut Node, (With<NewGameButton>, Without<HeaderRoot>)>,
+    mut button_text_query: Query<&mut TextFont, (With<ButtonText>, Without<UIScoreText>)>,
+) {
+    let Some(window) = windows.iter().next() else {
+        return;
+    };
+    let width = window.resolution.width();
+    let narrow = width < NARROW_THRESHOLD;
+
+    for mut node in &mut header_query {
+        let target = if narrow {
+            UiRect::axes(Val::Px(8.0), Val::Px(6.0))
+        } else {
+            UiRect::axes(Val::Px(16.0), Val::Px(10.0))
+        };
+        if node.padding != target {
+            node.padding = target;
+        }
+    }
+
+    for mut font in &mut score_query {
+        let target = if narrow { 22.0 } else { 36.0 };
+        if font.font_size != target {
+            font.font_size = target;
+        }
+    }
+
+    for mut node in &mut button_query {
+        let target = if narrow {
+            UiRect::axes(Val::Px(12.0), Val::Px(6.0))
+        } else {
+            UiRect::axes(Val::Px(24.0), Val::Px(12.0))
+        };
+        if node.padding != target {
+            node.padding = target;
+        }
+    }
+
+    for mut font in &mut button_text_query {
+        let target = if narrow { 16.0 } else { 24.0 };
+        if font.font_size != target {
+            font.font_size = target;
+        }
     }
 }
