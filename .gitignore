@@ -1,0 +1,6 @@
+/target
+.cargo/config.toml
+
+/.zed
+.cocoindex_code
+.serena
