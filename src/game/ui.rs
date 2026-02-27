@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 use rand::rng;
 
+use super::GameFont;
 use super::animation::{AnimationPhase, PendingSlide};
 use super::board::{Board, Score};
+use super::render::{VisualTile, spawn_visual_tile};
 use super::{GamePhase, HasWon};
-use super::render::{spawn_visual_tile, VisualTile};
-use super::GameFont;
 
 #[derive(Component)]
 pub(super) struct UIScoreText;
@@ -104,10 +104,7 @@ fn on_new_game_click(
     }
 }
 
-fn on_continue_click(
-    _click: On<Pointer<Click>>,
-    mut next_state: ResMut<NextState<GamePhase>>,
-) {
+fn on_continue_click(_click: On<Pointer<Click>>, mut next_state: ResMut<NextState<GamePhase>>) {
     next_state.set(GamePhase::Playing);
 }
 
@@ -221,18 +218,11 @@ pub(super) fn spawn_game_over_overlay(
     spawn_overlay(&mut commands, "Game Over", **score, false, &font.0);
 }
 
-pub(super) fn spawn_won_overlay(
-    mut commands: Commands,
-    score: Res<Score>,
-    font: Res<GameFont>,
-) {
+pub(super) fn spawn_won_overlay(mut commands: Commands, score: Res<Score>, font: Res<GameFont>) {
     spawn_overlay(&mut commands, "You Win!", **score, true, &font.0);
 }
 
-pub(super) fn despawn_overlay(
-    mut commands: Commands,
-    overlay: Query<Entity, With<OverlayRoot>>,
-) {
+pub(super) fn despawn_overlay(mut commands: Commands, overlay: Query<Entity, With<OverlayRoot>>) {
     for entity in &overlay {
         commands.entity(entity).despawn();
     }

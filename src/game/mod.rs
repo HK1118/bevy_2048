@@ -9,7 +9,7 @@ use rand::rng;
 
 use animation::{AnimationPhase, PendingSlide};
 use board::{Board, Score};
-use input::{handle_input, on_drag_end, Slide};
+use input::{Slide, handle_input, on_drag_end};
 
 #[derive(Resource)]
 pub(super) struct GameFont(pub(super) Handle<Font>);
@@ -39,7 +39,10 @@ impl Plugin for GamePlugin {
             .init_state::<GamePhase>()
             .add_message::<Slide>()
             .add_observer(on_drag_end)
-            .add_systems(Startup, (load_font, render::setup_board, ui::setup_ui).chain())
+            .add_systems(
+                Startup,
+                (load_font, render::setup_board, ui::setup_ui).chain(),
+            )
             .add_systems(
                 Update,
                 (

@@ -3,8 +3,8 @@ use std::num::NonZero;
 use bevy::camera::ScalingMode;
 use bevy::prelude::*;
 
-use super::board::{exp_to_value, Board, BOARD_SIZE};
 use super::GameFont;
+use super::board::{BOARD_SIZE, Board, exp_to_value};
 
 pub(super) const TILE_SIZE: f32 = 100.0;
 pub(super) const TILE_GAP: f32 = 10.0;
@@ -50,18 +50,18 @@ pub(super) fn board_index_to_position(index: usize) -> Vec2 {
 pub(super) fn tile_color(exp: Option<NonZero<u8>>) -> Color {
     match exp.map(|e| e.get()) {
         None => COLOR_EMPTY_CELL,
-        Some(1) => Color::srgb(0.933, 0.894, 0.855),  // 2
-        Some(2) => Color::srgb(0.933, 0.882, 0.788),  // 4
-        Some(3) => Color::srgb(0.953, 0.698, 0.478),  // 8
-        Some(4) => Color::srgb(0.965, 0.588, 0.392),  // 16
-        Some(5) => Color::srgb(0.969, 0.486, 0.373),  // 32
-        Some(6) => Color::srgb(0.969, 0.373, 0.231),  // 64
-        Some(7) => Color::srgb(0.929, 0.816, 0.451),  // 128
-        Some(8) => Color::srgb(0.929, 0.800, 0.384),  // 256
-        Some(9) => Color::srgb(0.929, 0.788, 0.314),  // 512
+        Some(1) => Color::srgb(0.933, 0.894, 0.855), // 2
+        Some(2) => Color::srgb(0.933, 0.882, 0.788), // 4
+        Some(3) => Color::srgb(0.953, 0.698, 0.478), // 8
+        Some(4) => Color::srgb(0.965, 0.588, 0.392), // 16
+        Some(5) => Color::srgb(0.969, 0.486, 0.373), // 32
+        Some(6) => Color::srgb(0.969, 0.373, 0.231), // 64
+        Some(7) => Color::srgb(0.929, 0.816, 0.451), // 128
+        Some(8) => Color::srgb(0.929, 0.800, 0.384), // 256
+        Some(9) => Color::srgb(0.929, 0.788, 0.314), // 512
         Some(10) => Color::srgb(0.929, 0.773, 0.247), // 1024
         Some(11) => Color::srgb(0.929, 0.761, 0.180), // 2048
-        _ => Color::srgb(0.239, 0.227, 0.196),        // > 2048
+        _ => Color::srgb(0.239, 0.227, 0.196),       // > 2048
     }
 }
 
@@ -114,8 +114,7 @@ pub(super) fn spawn_visual_tile(
                 },
                 TextColor(text_color(tile)),
                 TextLayout::new_with_justify(Justify::Center),
-                Transform::from_translation(Vec3::Z)
-                    .with_scale(Vec3::splat(inv_scale)),
+                Transform::from_translation(Vec3::Z).with_scale(Vec3::splat(inv_scale)),
             ));
         })
         .id()
