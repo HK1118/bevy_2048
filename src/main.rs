@@ -2,7 +2,13 @@
 
 mod game;
 
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use std::time::Duration;
+
+use bevy::{
+    asset::AssetMetaCheck,
+    prelude::*,
+    winit::{UpdateMode, WinitSettings},
+};
 #[cfg(feature = "dev_native")]
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
@@ -25,7 +31,11 @@ fn main() -> AppExit {
                 ..default()
             }),
     )
-    .add_plugins(game::GamePlugin);
+    .add_plugins(game::GamePlugin)
+    .insert_resource(WinitSettings {
+        focused_mode: UpdateMode::reactive(Duration::from_secs(1)),
+        unfocused_mode: UpdateMode::reactive_low_power(Duration::from_secs(1)),
+    });
 
     #[cfg(feature = "dev_native")]
     app.add_plugins(EguiPlugin::default())

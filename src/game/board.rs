@@ -108,28 +108,6 @@ impl Board {
         false
     }
 
-    // #[cfg(test)]
-    // pub(super) fn slide(&mut self, direction: Direction) -> (bool, u32) {
-    //     let mut changed = false;
-    //     let mut total_score = 0u32;
-
-    //     for i in 0..BOARD_SIZE {
-    //         let indices = direction.line_indices(i);
-    //         let line = indices.map(|index| self[index]);
-    //         let (c, new_line, score) = slide_line(line);
-
-    //         if c {
-    //             changed = true;
-    //             total_score += score;
-    //             for (index, value) in indices.into_iter().zip(new_line) {
-    //                 self[index] = value;
-    //             }
-    //         }
-    //     }
-
-    //     (changed, total_score)
-    // }
-
     pub(super) fn compute_slide(&self, direction: Direction) -> SlideResult {
         let mut new_board = self.clone();
         let mut all_movements = Vec::new();
@@ -164,36 +142,6 @@ impl Board {
         }
     }
 }
-
-// #[cfg(test)]
-// fn slide_line(
-//     line: [Option<NonZero<u8>>; BOARD_SIZE],
-// ) -> (bool, [Option<NonZero<u8>>; BOARD_SIZE], u32) {
-//     // パス1: Noneを除いた非空タイルをコンパクトに並べる
-//     let tiles: Vec<NonZero<u8>> = line.into_iter().flatten().collect();
-
-//     // パス2: 先頭から走査し、隣接する同値タイルをマージしながら result を構築する
-//     let mut result = [None; BOARD_SIZE];
-//     let mut score = 0u32;
-//     let mut write = 0;
-//     let mut i = 0;
-
-//     while i < tiles.len() {
-//         if i + 1 < tiles.len() && tiles[i] == tiles[i + 1] {
-//             // 同値タイルを合体（指数+1 = 値×2）
-//             let merged_exp = tiles[i].get() + 1;
-//             result[write] = Some(non_zero_exp(merged_exp));
-//             score += exp_to_value(merged_exp);
-//             i += 2;
-//         } else {
-//             result[write] = Some(tiles[i]);
-//             i += 1;
-//         }
-//         write += 1;
-//     }
-
-//     (result != line, result, score)
-// }
 
 fn slide_line_with_movements(
     line: [Option<NonZero<u8>>; BOARD_SIZE],
@@ -267,83 +215,3 @@ impl fmt::Display for Board {
         Ok(())
     }
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     fn tile(v: u8) -> Option<NonZero<u8>> {
-//         Some(non_zero_exp(v))
-//     }
-
-//     #[test]
-//     fn test_slide_empty_line() {
-//         let (changed, result, score) = slide_line([None; BOARD_SIZE]);
-//         assert!(!changed);
-//         assert_eq!(result, [None; BOARD_SIZE]);
-//         assert_eq!(score, 0);
-//     }
-
-//     #[test]
-//     fn test_slide_merge_two() {
-//         // [2, 2, _, _] -> [4, _, _, _], score=4
-//         let (changed, result, score) = slide_line([tile(1), tile(1), None, None]);
-//         assert!(changed);
-//         assert_eq!(result, [tile(2), None, None, None]);
-//         assert_eq!(score, 4);
-//     }
-
-//     #[test]
-//     fn test_slide_already_packed_no_change() {
-//         // [2, 4, _, _] -> already packed, no change
-//         let (changed, result, score) = slide_line([tile(1), tile(2), None, None]);
-//         assert!(!changed);
-//         assert_eq!(result, [tile(1), tile(2), None, None]);
-//         assert_eq!(score, 0);
-//     }
-
-//     #[test]
-//     fn test_slide_move_without_merge() {
-//         // [_, 2, _, _] -> [2, _, _, _]
-//         let (changed, result, score) = slide_line([None, tile(1), None, None]);
-//         assert!(changed);
-//         assert_eq!(result, [tile(1), None, None, None]);
-//         assert_eq!(score, 0);
-//     }
-
-//     #[test]
-//     fn test_slide_no_double_merge() {
-//         // [2, 2, 2, 2] -> [4, 4, _, _], not [8, _, _, _]
-//         let (changed, result, score) = slide_line([tile(1), tile(1), tile(1), tile(1)]);
-//         assert!(changed);
-//         assert_eq!(result, [tile(2), tile(2), None, None]);
-//         assert_eq!(score, 8); // 4 + 4
-//     }
-
-//     #[test]
-//     fn test_slide_three_same() {
-//         // [2, 2, 2, _] -> [4, 2, _, _]
-//         let (changed, result, score) = slide_line([tile(1), tile(1), tile(1), None]);
-//         assert!(changed);
-//         assert_eq!(result, [tile(2), tile(1), None, None]);
-//         assert_eq!(score, 4);
-//     }
-
-//     #[test]
-//     fn test_slide_merge_with_gap() {
-//         // [2, _, 2, _] -> [4, _, _, _]
-//         let (changed, result, score) = slide_line([tile(1), None, tile(1), None]);
-//         assert!(changed);
-//         assert_eq!(result, [tile(2), None, None, None]);
-//         assert_eq!(score, 4);
-//     }
-
-//     #[test]
-//     fn test_direction_indices() {
-//         println!("Direction::Left: {:?}", Direction::Left.line_indices(1));
-//         assert_eq!(Direction::Left.line_indices(0), [0, 1, 2, 3]);
-//         assert_eq!(Direction::Right.line_indices(0), [3, 2, 1, 0]);
-//         assert_eq!(Direction::Up.line_indices(0), [12, 8, 4, 0]);
-//         assert_eq!(Direction::Down.line_indices(0), [0, 4, 8, 12]);
-//     }
-// }

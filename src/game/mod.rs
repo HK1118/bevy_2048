@@ -62,6 +62,7 @@ impl Plugin for GamePlugin {
                     ui::sync_ui_score,
                     ui::button_hover,
                     ui::adapt_header_to_window,
+                    request_redraw_during_animation,
                 ),
             )
             .add_systems(OnEnter(GamePhase::GameOver), ui::spawn_game_over_overlay)
@@ -96,5 +97,14 @@ fn check_game_state(
     // ゲームオーバーチェック
     if !board.can_move() {
         next_state.set(GamePhase::GameOver);
+    }
+}
+
+fn request_redraw_during_animation(
+    phase: Res<AnimationPhase>,
+    mut redraw: MessageWriter<bevy::window::RequestRedraw>,
+) {
+    if *phase != AnimationPhase::Idle {
+        redraw.write(bevy::window::RequestRedraw);
     }
 }
