@@ -52,6 +52,7 @@ impl Plugin for GamePlugin {
                     animation::resolve_slide,
                     animation::animate_effects,
                     check_game_state,
+                    request_redraw_during_animation,
                 )
                     .chain()
                     .run_if(in_state(GamePhase::Playing)),
@@ -62,7 +63,6 @@ impl Plugin for GamePlugin {
                     ui::sync_ui_score,
                     ui::button_hover,
                     ui::adapt_header_to_window,
-                    request_redraw_during_animation,
                 ),
             )
             .add_systems(OnEnter(GamePhase::GameOver), ui::spawn_game_over_overlay)

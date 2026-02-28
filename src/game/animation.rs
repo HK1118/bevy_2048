@@ -6,9 +6,13 @@ use super::board::{Board, Score, SlideResult};
 use super::input::Slide;
 use super::render::{VisualTile, board_index_to_position, spawn_visual_tile};
 
+use std::time::Duration;
+
 const SLIDE_DURATION: f32 = 0.08;
 const EFFECT_DURATION: f32 = 0.05;
 const MERGE_SCALE_PEAK: f32 = 1.2;
+/// Reactive モードでアイドル後の大きな delta がアニメーションを一瞬で完了させるのを防ぐ
+const MAX_ANIM_DELTA: Duration = Duration::from_millis(16);
 
 #[derive(Resource, Default, PartialEq, Debug)]
 pub(super) enum AnimationPhase {
@@ -92,8 +96,9 @@ pub(super) fn animate_slide(
         return;
     }
 
+    let delta = time.delta().min(MAX_ANIM_DELTA);
     for (mut transform, mut anim) in &mut tiles {
-        anim.timer.tick(time.delta());
+        anim.timer.tick(delta);
         let t = ease_out_cubic(anim.timer.fraction());
         let pos = anim.from.lerp(anim.to, t);
         transform.translation.x = pos.x;
@@ -177,10 +182,11 @@ pub(super) fn animate_effects(
         return;
     }
 
+    let delta = time.delta().min(MAX_ANIM_DELTA);
     let mut all_done = true;
 
     for (mut transform, mut anim) in &mut merge_tiles {
-        anim.0.tick(time.delta());
+        anim.0.tick(delta);
         let t = anim.0.fraction();
         let scale = 1.0 + (MERGE_SCALE_PEAK - 1.0) * (t * std::f32::consts::PI).sin();
         transform.scale = Vec3::splat(scale);
@@ -190,7 +196,7 @@ pub(super) fn animate_effects(
     }
 
     for (mut transform, mut anim) in &mut spawn_tiles {
-        anim.0.tick(time.delta());
+        anim.0.tick(delta);
         let t = ease_out_cubic(anim.0.fraction());
         transform.scale = Vec3::splat(t);
         if !anim.0.is_finished() {
