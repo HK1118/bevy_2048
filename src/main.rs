@@ -5,7 +5,7 @@ mod game;
 use std::time::Duration;
 
 #[cfg(feature = "dev_native")]
-use bevy::dev_tools::fps_overlay::FpsOverlayPlugin;
+use bevy::dev_tools::fps_overlay::{FpsOverlayConfig, FpsOverlayPlugin};
 use bevy::{
     asset::AssetMetaCheck,
     prelude::*,
@@ -42,7 +42,12 @@ fn main() -> AppExit {
     #[cfg(feature = "dev_native")]
     app.add_plugins(EguiPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins(FpsOverlayPlugin::default());
+        .add_plugins(FpsOverlayPlugin {
+            config: FpsOverlayConfig {
+                text_color: Color::BLACK,
+                ..default()
+            },
+        });
 
     app.run()
 }
