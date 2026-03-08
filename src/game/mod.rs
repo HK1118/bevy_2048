@@ -5,6 +5,7 @@ mod render;
 mod ui;
 
 use bevy::prelude::*;
+use bevy::winit::{UpdateMode, WinitSettings};
 use rand::rng;
 
 use animation::{AnimationPhase, PendingSlide};
@@ -25,6 +26,9 @@ pub(super) enum GamePhase {
 #[derive(Resource, Default)]
 pub(super) struct HasWon(pub(super) bool);
 
+#[derive(Resource, Clone)]
+struct IdleFocusedUpdateMode(UpdateMode);
+
 pub(super) struct GamePlugin;
 
 impl Plugin for GamePlugin {
@@ -41,7 +45,13 @@ impl Plugin for GamePlugin {
             .add_observer(on_drag_end)
             .add_systems(
                 Startup,
-                (load_font, render::setup_board, ui::setup_ui).chain(),
+                (
+                    load_font,
+                    capture_idle_update_mode,
+                    render::setup_board,
+                    ui::setup_ui,
+                )
+                    .chain(),
             )
             .add_systems(
                 Update,
@@ -53,6 +63,7 @@ impl Plugin for GamePlugin {
                     animation::animate_effects,
                     check_game_state,
                     request_redraw_during_animation,
+                    sync_focused_update_mode,
                 )
                     .chain()
                     .run_if(in_state(GamePhase::Playing)),
@@ -75,6 +86,10 @@ impl Plugin for GamePlugin {
 fn load_font(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/DotGothic16-Regular.ttf");
     commands.insert_resource(GameFont(font));
+}
+
+fn capture_idle_update_mode(mut commands: Commands, winit_settings: Res<WinitSettings>) {
+    commands.insert_resource(IdleFocusedUpdateMode(winit_settings.focused_mode));
 }
 
 fn check_game_state(
@@ -106,5 +121,21 @@ fn request_redraw_during_animation(
 ) {
     if *phase != AnimationPhase::Idle {
         redraw.write(bevy::window::RequestRedraw);
+    }
+}
+
+fn sync_focused_update_mode(
+    phase: Res<AnimationPhase>,
+    idle_mode: Res<IdleFocusedUpdateMode>,
+    mut winit_settings: ResMut<WinitSettings>,
+) {
+    let desired_mode = if *phase == AnimationPhase::Idle {
+        idle_mode.0
+    } else {
+        UpdateMode::Continuous
+    };
+
+    if winit_settings.focused_mode != desired_mode {
+        winit_settings.focused_mode = desired_mode;
     }
 }
