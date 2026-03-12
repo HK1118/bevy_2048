@@ -215,3 +215,139 @@ impl fmt::Display for Board {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn cell_exp(exp: u8) -> Option<NonZero<u8>> {
+        Some(non_zero_exp(exp))
+    }
+
+    fn board_with(entries: &[(usize, u8)]) -> Board {
+        let mut board = Board::default();
+        for &(index, exponent) in entries {
+            board[index] = cell_exp(exponent);
+        }
+        board
+    }
+
+    #[test]
+    fn slide_left_merges_once_for_three_equal_tiles() {
+        let board = board_with(&[
+            (Board::index(0, 0), 1),
+            (Board::index(1, 0), 1),
+            (Board::index(2, 0), 1),
+        ]);
+
+        let result = board.compute_slide(Direction::Left);
+
+        assert!(result.changed);
+        assert_eq!(result.score_gained, 4);
+        assert_eq!(result.new_board[Board::index(0, 0)], cell_exp(2));
+        assert_eq!(result.new_board[Board::index(1, 0)], cell_exp(1));
+        assert_eq!(result.new_board[Board::index(2, 0)], None);
+        assert_eq!(result.new_board[Board::index(3, 0)], None);
+        assert_eq!(result.merge_destinations, vec![Board::index(0, 0)]);
+    }
+
+    #[test]
+    fn slide_left_double_merge_for_four_equal_tiles() {
+        let board = board_with(&[
+            (Board::index(0, 1), 1),
+            (Board::index(1, 1), 1),
+            (Board::index(2, 1), 1),
+            (Board::index(3, 1), 1),
+        ]);
+
+        let result = board.compute_slide(Direction::Left);
+
+        assert!(result.changed);
+        assert_eq!(result.score_gained, 8);
+        assert_eq!(result.new_board[Board::index(0, 1)], cell_exp(2));
+        assert_eq!(result.new_board[Board::index(1, 1)], cell_exp(2));
+        assert_eq!(result.new_board[Board::index(2, 1)], None);
+        assert_eq!(result.new_board[Board::index(3, 1)], None);
+        assert_eq!(
+            result.merge_destinations,
+            vec![Board::index(0, 1), Board::index(1, 1)]
+        );
+    }
+
+    #[test]
+    fn slide_left_no_change_on_already_compacted_line() {
+        let board = board_with(&[(Board::index(0, 0), 1), (Board::index(1, 0), 2)]);
+
+        let result = board.compute_slide(Direction::Left);
+
+        assert!(!result.changed);
+        assert_eq!(result.score_gained, 0);
+        assert_eq!(result.new_board[Board::index(0, 0)], cell_exp(1));
+        assert_eq!(result.new_board[Board::index(1, 0)], cell_exp(2));
+    }
+
+    #[test]
+    fn slide_vertical_moves_to_expected_edge() {
+        let board = board_with(&[(Board::index(0, 0), 1), (Board::index(3, 3), 2)]);
+
+        let up = board.compute_slide(Direction::Up);
+        assert_eq!(up.new_board[Board::index(0, 3)], cell_exp(1));
+        assert_eq!(up.new_board[Board::index(3, 3)], cell_exp(2));
+
+        let down = board.compute_slide(Direction::Down);
+        assert_eq!(down.new_board[Board::index(0, 0)], cell_exp(1));
+        assert_eq!(down.new_board[Board::index(3, 0)], cell_exp(2));
+    }
+
+    #[test]
+    fn can_move_true_when_board_has_empty_cell() {
+        let board = board_with(&[(Board::index(0, 0), 1)]);
+        assert!(board.can_move());
+    }
+
+    #[test]
+    fn can_move_true_when_adjacent_equal_tiles_exist() {
+        let board = board_with(&[
+            (Board::index(0, 0), 1),
+            (Board::index(1, 0), 1),
+            (Board::index(2, 0), 2),
+            (Board::index(3, 0), 3),
+            (Board::index(0, 1), 4),
+            (Board::index(1, 1), 5),
+            (Board::index(2, 1), 6),
+            (Board::index(3, 1), 7),
+            (Board::index(0, 2), 8),
+            (Board::index(1, 2), 9),
+            (Board::index(2, 2), 10),
+            (Board::index(3, 2), 11),
+            (Board::index(0, 3), 12),
+            (Board::index(1, 3), 13),
+            (Board::index(2, 3), 14),
+            (Board::index(3, 3), 15),
+        ]);
+        assert!(board.can_move());
+    }
+
+    #[test]
+    fn can_move_false_when_board_is_full_and_blocked() {
+        let board = board_with(&[
+            (Board::index(0, 0), 1),
+            (Board::index(1, 0), 2),
+            (Board::index(2, 0), 3),
+            (Board::index(3, 0), 4),
+            (Board::index(0, 1), 5),
+            (Board::index(1, 1), 6),
+            (Board::index(2, 1), 7),
+            (Board::index(3, 1), 8),
+            (Board::index(0, 2), 9),
+            (Board::index(1, 2), 10),
+            (Board::index(2, 2), 11),
+            (Board::index(3, 2), 12),
+            (Board::index(0, 3), 13),
+            (Board::index(1, 3), 14),
+            (Board::index(2, 3), 15),
+            (Board::index(3, 3), 16),
+        ]);
+        assert!(!board.can_move());
+    }
+}
