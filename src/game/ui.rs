@@ -53,8 +53,8 @@ pub(super) fn setup_ui(mut commands: Commands, font: Res<GameFont>) {
                 UIScoreText,
                 Text::new("Score: 0"),
                 TextFont {
-                    font: font.0.clone(),
-                    font_size: 36.0,
+                    font: font.0.clone().into(),
+                    font_size: 36.0.into(),
                     ..default()
                 },
                 TextColor(SCORE_COLOR),
@@ -77,8 +77,8 @@ pub(super) fn setup_ui(mut commands: Commands, font: Res<GameFont>) {
                         ButtonText,
                         Text::new("New Game"),
                         TextFont {
-                            font: font.0.clone(),
-                            font_size: 24.0,
+                            font: font.0.clone().into(),
+                            font_size: 24.0.into(),
                             ..default()
                         },
                         TextColor(Color::WHITE),
@@ -140,8 +140,8 @@ fn spawn_overlay_button<'a>(
         children![(
             Text::new(label.to_string()),
             TextFont {
-                font: font.clone(),
-                font_size: 20.0,
+                font: font.into(),
+                font_size: 20.0.into(),
                 ..default()
             },
             TextColor(Color::WHITE),
@@ -186,8 +186,8 @@ fn spawn_overlay(
                     parent.spawn((
                         Text::new(title),
                         TextFont {
-                            font: font.clone(),
-                            font_size: 48.0,
+                            font: font.clone().into(),
+                            font_size: 48.0.into(),
                             ..default()
                         },
                         TextColor(Color::WHITE),
@@ -197,8 +197,8 @@ fn spawn_overlay(
                     parent.spawn((
                         Text::new(format!("Score: {score_value}")),
                         TextFont {
-                            font: font.clone(),
-                            font_size: 24.0,
+                            font: font.clone().into(),
+                            font_size: 24.0.into(),
                             ..default()
                         },
                         TextColor(Color::srgba(1.0, 1.0, 1.0, 0.8)),
@@ -290,8 +290,8 @@ pub(super) fn adapt_header_to_window(
 
     for mut font in &mut score_query {
         let target = if narrow { 22.0 } else { 36.0 };
-        if font.font_size != target {
-            font.font_size = target;
+        if font.font_size != FontSize::Px(target) {
+            font.font_size = target.into();
         }
     }
 
@@ -308,8 +308,8 @@ pub(super) fn adapt_header_to_window(
 
     for mut font in &mut button_text_query {
         let target = if narrow { 16.0 } else { 24.0 };
-        if font.font_size != target {
-            font.font_size = target;
+        if font.font_size != FontSize::Px(target) {
+            font.font_size = target.into();
         }
     }
 }

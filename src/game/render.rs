@@ -108,12 +108,12 @@ pub(super) fn spawn_visual_tile(
                 TileText,
                 Text2d::new(exp_to_value(exp.get()).to_string()),
                 TextFont {
-                    font: font.0.clone(),
-                    font_size: font_size_for_tile(tile) * TEXT_RENDER_SCALE,
+                    font: font.0.clone().into(),
+                    font_size: (font_size_for_tile(tile) * TEXT_RENDER_SCALE).into(),
                     ..default()
                 },
                 TextColor(text_color(tile)),
-                TextLayout::new_with_justify(Justify::Center),
+                TextLayout::justify(Justify::Center),
                 Transform::from_translation(Vec3::Z).with_scale(Vec3::splat(inv_scale)),
             ));
         })

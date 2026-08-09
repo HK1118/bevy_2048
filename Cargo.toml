@@ -6,9 +6,9 @@ edition = "2024"
 
 [dependencies]
 # Use only features needed for a 2D game to improve compile time and size
-bevy = { version = "0.18", default-features = false, features = ["2d"] }
-bevy-inspector-egui = "0.36.0"
-rand = "0.10"
+bevy = { version = "0.19", default-features = false, features = ["2d", "ui"] }
+bevy-inspector-egui = "0.37.0"
+rand = "0.10.2"
 # Compile out low-severity logs to improve performance.
 # Remove these features if you want to profile your game with tracy.
 # (see <https://github.com/bevyengine/bevy/blob/main/docs/profiling.md#tracy-profiler>)
