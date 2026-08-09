@@ -115,7 +115,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Determine version number
         id: version
         # Use the input from workflow dispatch, or fall back to the Cargo.toml version
@@ -209,7 +209,7 @@ jobs:
 
       - name: Checkout repository
         if: ${{ env.is_platform_enabled == 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           lfs: ${{ env.git_lfs }}
 

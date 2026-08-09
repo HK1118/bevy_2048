@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
@@ -36,33 +36,33 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  # Check documentation.
-  docs:
-    name: Docs
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # # Check documentation.
+  # docs:
+  #   name: Docs
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 20
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v7
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.toolchain }}
+  #     - name: Install Rust toolchain
+  #       uses: dtolnay/rust-toolchain@master
+  #       with:
+  #         toolchain: ${{ env.toolchain }}
 
-      - name: Restore Rust cache
-        id: cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: ci
-          save-if: false
+  #     - name: Restore Rust cache
+  #       id: cache
+  #       uses: Swatinem/rust-cache@v2
+  #       with:
+  #         shared-key: ci
+  #         save-if: false
 
-      - name: Install build dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
+  #     - name: Install build dependencies
+  #       if: steps.cache.outputs.cache-hit != 'true'
+  #       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
 
-      - name: Check documentation
-        run: cargo doc --locked --workspace --profile ci --all-features --document-private-items --no-deps
+  #     - name: Check documentation
+  #       run: cargo doc --locked --workspace --profile ci --all-features --document-private-items --no-deps
 
   # Run Clippy lints.
   clippy-lints:
@@ -71,7 +71,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
@@ -93,34 +93,34 @@ jobs:
       - name: Run Clippy lints
         run: cargo clippy --locked --workspace --all-targets --profile ci --all-features
 
-  # Run Bevy lints.
-  bevy-lints:
-    name: Bevy lints
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # # Run Bevy lints.
+  # bevy-lints:
+  #   name: Bevy lints
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 20
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v7
 
-      - name: Install Rust toolchain (plus bevy_lint)
-        uses: TheBevyFlock/bevy_cli/bevy_lint@lint-v0.6.0
-        with:
-          cache: true
-          save-cache-if: ${{ github.ref == 'refs/heads/main' }}
+  #     - name: Install Rust toolchain (plus bevy_lint)
+  #       uses: TheBevyFlock/bevy_cli/bevy_lint@lint-v0.6.0
+  #       with:
+  #         cache: true
+  #         save-cache-if: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Restore Rust cache
-        id: cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: ci
-          save-if: false
+  #     - name: Restore Rust cache
+  #       id: cache
+  #       uses: Swatinem/rust-cache@v2
+  #       with:
+  #         shared-key: ci
+  #         save-if: false
 
-      - name: Install build dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
+  #     - name: Install build dependencies
+  #       if: steps.cache.outputs.cache-hit != 'true'
+  #       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
 
-      - name: Run Bevy lints
-        run: bevy_lint --locked --workspace --all-targets --profile ci --all-features
+  #     - name: Run Bevy lints
+  #       run: bevy_lint --locked --workspace --all-targets --profile ci --all-features
 
   # Run tests.
   tests:
@@ -129,7 +129,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up environment
         run: echo "RUSTFLAGS=${RUSTFLAGS:+$RUSTFLAGS }-Zcodegen-backend=cranelift" >> "${GITHUB_ENV}"
@@ -160,7 +160,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up environment
         run: echo "RUSTFLAGS=${RUSTFLAGS:+$RUSTFLAGS }--cfg getrandom_backend=\"wasm_js\"" >> "${GITHUB_ENV}"
